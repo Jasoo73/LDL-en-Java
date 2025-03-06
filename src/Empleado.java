@@ -1,9 +1,9 @@
 package src;
 
 public class Empleado{
-    String nombre;
-    int id;
-    float salario;
+    private String nombre;       //Se ocultan los detalles internos para que solo desde esta clase se pueda cambiar el valor de los atríbutos de un objeto de tipo 'Empleado'
+    private int id;
+    private float salario;
 
     public Empleado(String nombre, int id, float salario){
         this.nombre = nombre;

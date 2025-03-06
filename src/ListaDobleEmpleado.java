@@ -1,9 +1,15 @@
 package src;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import javax.swing.JOptionPane;
+
 public class ListaDobleEmpleado {
 
-    //Clase sin variables
-    
+    private int contadorEmpleados;
+    private float totalSalarios;
+
     private Nodo cabeza;
     private Nodo cola;
 
@@ -15,6 +21,7 @@ public class ListaDobleEmpleado {
     //Metodos
 
     public void Insertar_Empleado(Empleado empleado){
+
         Nodo nuevoNodo = new Nodo(empleado);
 
         if (cabeza == null) {
@@ -26,6 +33,10 @@ public class ListaDobleEmpleado {
             nuevoNodo.anterior = cola;
             cola = nuevoNodo;
         }
+
+         // Actualizar el contador de empleados y el total de salarios
+        contadorEmpleados++; // Incrementar el contador de empleados
+        totalSalarios += empleado.getSalario(); // Acumular el salario del nuevo empleado
     }
 
     public Empleado Buscar_Empleado(int id){
@@ -53,6 +64,10 @@ public class ListaDobleEmpleado {
                 } else {
                     cola = actual.anterior;                        //Se elimina el último nodo en caso de que ese sea el que buscabamos.
                 }
+
+                // Actualizar el total de salarios y el contador de empleados
+                contadorEmpleados--;
+                totalSalarios -= actual.empleado.getSalario();
                 return true;                                        
             }
             actual = actual.siguiente;
@@ -99,17 +114,9 @@ public class ListaDobleEmpleado {
     
     }
 
-    public float Calcular_Promedio_Salario(){
-        if (cabeza == null) return 0;
-        float suma = 0;
-        int contador = 0;
-        Nodo actual = cabeza;
-        while (actual != null){
-            suma += actual.empleado.getSalario();
-            contador ++;
-            actual = actual.siguiente;
-        }
-        return (contador == 0) ? 0 : suma/contador;          // ( ? : ) Es un operador terniario que funciona como una estructura if/else
+    // Método para calcular el salario promedio
+    public float Calcular_Promedio_Salario() {
+        return (contadorEmpleados == 0) ? 0 : totalSalarios / contadorEmpleados;       //Operador terniario que funciona con estructura if/else.
     }
 
     public Empleado Encontrar_Salario_Maximo(){
@@ -138,17 +145,72 @@ public class ListaDobleEmpleado {
         return minimo;
     }
 
-    public void Obtener_Mediana_Salario(){
-        //Implementación
-    }
+    public float Calcular_Mediana_Salario() {
+        if (cabeza == null) {
+            return 0;  // Si la lista está vacía, no hay mediana
+        }
 
-    public void Imprimir_Lista(){
+        // Crear una lista para almacenar los salarios
+        ArrayList<Float> salarios = new ArrayList<>();
+
         Nodo actual = cabeza;
-        while (actual != null){
-            System.out.println(actual.empleado);
-        
+        while (actual != null) {
+            salarios.add(actual.empleado.getSalario());
             actual = actual.siguiente;
         }
+
+        // Ordenar los salarios de menor a mayor
+        Collections.sort(salarios);
+
+        int n = salarios.size();
+        
+        // Si el número de empleados es impar, la mediana es el valor del medio
+        if (n % 2 == 1) {
+            return salarios.get(n / 2);
+        } 
+        else {
+            // Si es par, la mediana es el promedio de los dos valores del medio
+            float salarioMedio1 = salarios.get((n / 2) - 1);
+            float salarioMedio2 = salarios.get(n / 2);
+            return (salarioMedio1 + salarioMedio2) / 2.0f;
+        }
     }
+    
+
+    public void Imprimir_Lista() {
+        if (cabeza == null) {
+            JOptionPane.showMessageDialog(null, "No hay empleados en la lista.", null, JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        //Lógica de impresión de lista
+
+        Nodo actual = cabeza;
+        StringBuilder empleados = new StringBuilder();             //StringBuilder porque los objetos de este tipo son mutables (su tamaño puede cambiar) y así lo actualizo.
+        
+        while (actual != null) {
+            empleados.append(actual.empleado.toString()).append("\n");
+            actual = actual.siguiente;
+        }
+
+        // Mostrar la lista completa de empleados
+        JOptionPane.showMessageDialog(null, empleados.toString(), "Lista de Empleados", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void Mostrar_Estadisticas() {
+        String stats = String.format(
+            "Número total de empleados: %d\n" +           //Marcadores de posición
+            "Salario promedio: %.2f\n" +
+            "Salario máximo: %.2f\n" +
+            "Salario mínimo: %.2f\n",
+            contadorEmpleados,                             //Valores
+            Calcular_Promedio_Salario(), 
+            (Encontrar_Salario_Maximo() != null ? Encontrar_Salario_Maximo().getSalario() : 0), 
+            (Encontrar_Salario_Minimo() != null ? Encontrar_Salario_Minimo().getSalario() : 0)
+        );
+        JOptionPane.showMessageDialog(null, stats, "Estadísticas de Empleados", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    
 }
 
